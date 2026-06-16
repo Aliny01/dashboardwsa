@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { RefreshCw, AlertCircle, Share2, BarChart2, FileText, Filter } from 'lucide-react'
+import { RefreshCw, AlertCircle, Share2, BarChart2, FileText, Filter, Lock } from 'lucide-react'
 import { format, subDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { clsx } from 'clsx'
@@ -18,15 +18,17 @@ import { GoogleCampaigns } from '@/components/google/GoogleCampaigns'
 import { GoogleKeywords } from '@/components/google/GoogleKeywords'
 import type { GoogleDashboardData } from '@/types/google'
 import { DashboardSummary } from '@/components/summary/DashboardSummary'
+import { PrivateSummary } from '@/components/summary/PrivateSummary'
 import { MetaFunnelView } from '@/components/meta/MetaFunnelView'
 
-type Tab = 'meta' | 'google' | 'summary' | 'funil'
+type Tab = 'meta' | 'google' | 'summary' | 'funil' | 'private'
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'meta', label: 'Meta Ads', icon: <Share2 className="w-3.5 h-3.5" /> },
   { id: 'google', label: 'Google Ads', icon: <BarChart2 className="w-3.5 h-3.5" /> },
   { id: 'summary', label: 'Resumo', icon: <FileText className="w-3.5 h-3.5" /> },
   { id: 'funil', label: 'Funil (teste)', icon: <Filter className="w-3.5 h-3.5" /> },
+  { id: 'private', label: 'Resumo Privado', icon: <Lock className="w-3.5 h-3.5" /> },
 ]
 
 function computeRange(days: number) {
@@ -351,6 +353,9 @@ export default function DashboardPage() {
             googleData={googleData}
           />
         )}
+
+        {/* Resumo Privado tab */}
+        {tab === 'private' && <PrivateSummary />}
 
         {/* Google Ads tab */}
         {tab === 'google' && (

@@ -1,0 +1,116 @@
+{
+  "sections": [
+    {
+      "id": "seguidores",
+      "title": "Campanhas de Seguidores",
+      "period": "09/06 a 16/06/2026",
+      "updatedAt": "2026-06-16",
+      "totals": {
+        "spend": 140.45,
+        "clicks": 2337,
+        "results": 1
+      },
+      "observation": "Semana com orçamento reduzido (saldo baixo). Rankings conferidos em comparativo 7 vs 14 dias — posições estáveis, a decisão não muda com mais tempo de análise.",
+      "videos": [
+        {
+          "rank": 1,
+          "name": "Post do Instagram",
+          "url": "https://www.facebook.com/101549656196804/posts/1254181779855808",
+          "reach": 3537,
+          "clicks": 313,
+          "ctr": 8.85,
+          "ret25": 42.4,
+          "ret50": 29.8,
+          "ret95": 25.1,
+          "spend": 16.69,
+          "action": "keep",
+          "note": "Melhor retenção 95% (25,1%) e melhor CTR (8,85%) com o menor gasto — o mais eficiente do período."
+        },
+        {
+          "rank": 2,
+          "name": "AD11 - DIGA ADEUS AO PINTOR",
+          "url": "https://www.facebook.com/101549656196804/posts/991643173266203",
+          "reach": 10048,
+          "clicks": 593,
+          "ctr": 5.90,
+          "ret25": 38.6,
+          "ret50": 31.4,
+          "ret95": 22.7,
+          "spend": 27.68,
+          "action": "keep",
+          "note": "Melhor equilíbrio retenção + volume. 2º em retenção (22,7%) e 2º em visitas (593). Custo/visita R$0,047."
+        },
+        {
+          "rank": 3,
+          "name": "Publicação: Quando você trabalha com...",
+          "url": "https://www.facebook.com/101549656196804/posts/957406466572070",
+          "reach": 10371,
+          "clicks": 654,
+          "ctr": 6.31,
+          "ret25": 29.7,
+          "ret50": 21.3,
+          "ret95": 13.2,
+          "spend": 28.23,
+          "action": "keep",
+          "note": "Maior volume de visitas (654) com custo/visita mais barato de todos (R$0,043). Retenção mediana, mas alcance forte."
+        },
+        {
+          "rank": 4,
+          "name": "AD07 - Quem é profissional de verdade",
+          "url": "https://www.facebook.com/101549656196804/posts/1655270573012614",
+          "reach": 2050,
+          "clicks": 75,
+          "ctr": 3.66,
+          "ret25": 38.5,
+          "ret50": 28.5,
+          "ret95": 20.3,
+          "spend": 11.38,
+          "action": "test",
+          "note": "Retenção 95% de 20,3% — vídeo genuinamente bom. Problema: o algoritmo priorizou AD11 dentro da mesma campanha e limitou a entrega. Testar com campanha exclusiva."
+        },
+        {
+          "rank": 5,
+          "name": "Publicação: Quer construir inteligente, LSF",
+          "url": "https://www.facebook.com/101549656196804/posts/1450265289584168",
+          "reach": 5273,
+          "clicks": 418,
+          "ctr": 7.93,
+          "ret25": 17.0,
+          "ret50": 8.8,
+          "ret95": 4.6,
+          "spend": 28.50,
+          "action": "test",
+          "note": "Único com resultado no período (1 mensagem). CTR bom (7,93%) mas queda brusca de retenção entre 25% e 50% — início forte, video perde a atenção no meio. Vale +1 semana."
+        },
+        {
+          "rank": 6,
+          "name": "Publicação: Telhado inteligente (telhas térmicas)",
+          "url": "https://www.facebook.com/101549656196804/posts/673814619081464",
+          "reach": 4241,
+          "clicks": 280,
+          "ctr": 6.60,
+          "ret25": 15.8,
+          "ret50": 11.2,
+          "ret95": 3.3,
+          "spend": 27.63,
+          "action": "pause",
+          "note": "Retenção 95% de apenas 3,3% — piora ainda mais com 14 dias (2,0%). Custo/visita mais alto (R$0,099). O público não está assistindo."
+        },
+        {
+          "rank": 7,
+          "name": "AD05 / AD06 / AD08 — campanha [TRÁFEGO] [SEGUIDORES] 1",
+          "url": null,
+          "reach": 57,
+          "clicks": 4,
+          "ctr": null,
+          "ret25": null,
+          "ret50": null,
+          "ret95": null,
+          "spend": 0.34,
+          "action": "pause",
+          "note": "Alcance somado de apenas 57 pessoas. O Meta escolheu AD11 como vencedor da campanha e parou de distribuir para esses anúncios. Podem ser pausados sem impacto."
+        }
+      ]
+    }
+  ]
+}
