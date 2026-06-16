@@ -39,14 +39,15 @@ function classifyConversion(name: string, value: number, acc: GoogleConversions)
 }
 
 export async function fetchGoogleDashboard(
-  daysOrRange: number | { since: string; until: string } = 7
+  daysOrRange: number | { since: string; until: string } = 7,
+  customerId?: string
 ): Promise<GoogleDashboardData> {
   const { since, until } = typeof daysOrRange === 'number'
     ? getDateRange(daysOrRange)
     : daysOrRange
 
   const customer = client.Customer({
-    customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID!,
+    customer_id: customerId ?? process.env.GOOGLE_ADS_CUSTOMER_ID!,
     refresh_token: process.env.GOOGLE_ADS_REFRESH_TOKEN!,
   })
 

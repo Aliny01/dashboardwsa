@@ -8,10 +8,11 @@ export async function GET(request: Request) {
     const until = searchParams.get('until')
     const days = parseInt(searchParams.get('days') ?? '7', 10)
     const withCreatives = searchParams.get('creatives') === 'true'
+    const accountId = searchParams.get('accountId') ?? undefined
 
     const rangeOrDays = since && until ? { since, until } : days
 
-    const data = await fetchMetaDashboard(rangeOrDays)
+    const data = await fetchMetaDashboard(rangeOrDays, accountId)
 
     if (withCreatives) {
       const activeCampaigns = data.campaigns

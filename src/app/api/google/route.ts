@@ -7,10 +7,11 @@ export async function GET(request: Request) {
     const since = searchParams.get('since')
     const until = searchParams.get('until')
     const days = parseInt(searchParams.get('days') ?? '7', 10)
+    const customerId = searchParams.get('customerId') ?? undefined
 
     const rangeOrDays = since && until ? { since, until } : days
 
-    const data = await fetchGoogleDashboard(rangeOrDays)
+    const data = await fetchGoogleDashboard(rangeOrDays, customerId)
     return NextResponse.json(data)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro desconhecido'

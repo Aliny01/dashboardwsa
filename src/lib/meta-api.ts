@@ -44,33 +44,35 @@ async function metaFetch(path: string, params: Record<string, string> = {}) {
 }
 
 export async function fetchMetaDashboard(
-  daysOrRange: number | { since: string; until: string } = 7
+  daysOrRange: number | { since: string; until: string } = 7,
+  accountId?: string
 ): Promise<MetaDashboardData> {
   const { since, until } = typeof daysOrRange === 'number'
     ? getDateRange(daysOrRange)
     : daysOrRange
 
+  const account = accountId ?? AD_ACCOUNT_ID
   const insightFields = ['spend', 'reach', 'impressions', 'clicks', 'cpc', 'cpm', 'cpp', 'actions', 'video_p25_watched_actions', 'video_p50_watched_actions', 'video_p95_watched_actions'].join(',')
   const timeRange = JSON.stringify({ since, until })
 
   const [accountData, campaignData, dailyData, igRaw] = await Promise.all([
-    metaFetch(`${AD_ACCOUNT_ID}/insights`, {
+    metaFetch(`${account}/insights`, {
       fields: insightFields,
       time_range: timeRange,
       level: 'account',
     }),
-    metaFetch(`${AD_ACCOUNT_ID}/campaigns`, {
+    metaFetch(`${account}/campaigns`, {
       fields: `id,name,status,objective,insights.time_range(${timeRange}){${insightFields}}`,
       effective_status: '["ACTIVE","PAUSED","CAMPAIGN_PAUSED","ADSET_PAUSED"]',
       limit: '50',
     }),
-    metaFetch(`${AD_ACCOUNT_ID}/insights`, {
+    metaFetch(`${account}/insights`, {
       fields: insightFields,
       time_range: timeRange,
       time_increment: '1',
       level: 'account',
     }),
-    metaFetch(`${AD_ACCOUNT_ID}`, {
+    metaFetch(`${account}`, {
       fields: 'name,instagram_accounts{followers_count,name,username,profile_picture_url}',
     }).catch(() => ({})),
   ])
