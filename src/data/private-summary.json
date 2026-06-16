@@ -2,19 +2,23 @@
   "sections": [
     {
       "id": "seguidores",
+      "sectionType": "video",
       "title": "Campanhas de Seguidores",
       "period": "09/06 a 16/06/2026",
       "updatedAt": "2026-06-16",
       "totals": {
         "spend": 140.45,
         "clicks": 2337,
-        "results": 1
+        "results": 1,
+        "resultLabel": "resultados"
       },
       "observation": "Semana com orçamento reduzido (saldo baixo). Rankings conferidos em comparativo 7 vs 14 dias — posições estáveis, a decisão não muda com mais tempo de análise.",
+      "campaigns": [],
       "videos": [
         {
           "rank": 1,
           "name": "Post do Instagram",
+          "campaign": "",
           "url": "https://www.facebook.com/101549656196804/posts/1254181779855808",
           "reach": 3537,
           "clicks": 313,
@@ -23,12 +27,15 @@
           "ret50": 29.8,
           "ret95": 25.1,
           "spend": 16.69,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "keep",
           "note": "Melhor retenção 95% (25,1%) e melhor CTR (8,85%) com o menor gasto — o mais eficiente do período."
         },
         {
           "rank": 2,
           "name": "AD11 - DIGA ADEUS AO PINTOR",
+          "campaign": "",
           "url": "https://www.facebook.com/101549656196804/posts/991643173266203",
           "reach": 10048,
           "clicks": 593,
@@ -37,12 +44,15 @@
           "ret50": 31.4,
           "ret95": 22.7,
           "spend": 27.68,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "keep",
           "note": "Melhor equilíbrio retenção + volume. 2º em retenção (22,7%) e 2º em visitas (593). Custo/visita R$0,047."
         },
         {
           "rank": 3,
           "name": "Publicação: Quando você trabalha com...",
+          "campaign": "",
           "url": "https://www.facebook.com/101549656196804/posts/957406466572070",
           "reach": 10371,
           "clicks": 654,
@@ -51,12 +61,15 @@
           "ret50": 21.3,
           "ret95": 13.2,
           "spend": 28.23,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "keep",
           "note": "Maior volume de visitas (654) com custo/visita mais barato de todos (R$0,043). Retenção mediana, mas alcance forte."
         },
         {
           "rank": 4,
           "name": "AD07 - Quem é profissional de verdade",
+          "campaign": "",
           "url": "https://www.facebook.com/101549656196804/posts/1655270573012614",
           "reach": 2050,
           "clicks": 75,
@@ -65,12 +78,15 @@
           "ret50": 28.5,
           "ret95": 20.3,
           "spend": 11.38,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "test",
           "note": "Retenção 95% de 20,3% — vídeo genuinamente bom. Problema: o algoritmo priorizou AD11 dentro da mesma campanha e limitou a entrega. Testar com campanha exclusiva."
         },
         {
           "rank": 5,
           "name": "Publicação: Quer construir inteligente, LSF",
+          "campaign": "",
           "url": "https://www.facebook.com/101549656196804/posts/1450265289584168",
           "reach": 5273,
           "clicks": 418,
@@ -79,12 +95,15 @@
           "ret50": 8.8,
           "ret95": 4.6,
           "spend": 28.50,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "test",
-          "note": "Único com resultado no período (1 mensagem). CTR bom (7,93%) mas queda brusca de retenção entre 25% e 50% — início forte, video perde a atenção no meio. Vale +1 semana."
+          "note": "Único com resultado no período (1 mensagem). CTR bom (7,93%) mas queda brusca de retenção entre 25% e 50% — início forte, vídeo perde a atenção no meio. Vale +1 semana."
         },
         {
           "rank": 6,
           "name": "Publicação: Telhado inteligente (telhas térmicas)",
+          "campaign": "",
           "url": "https://www.facebook.com/101549656196804/posts/673814619081464",
           "reach": 4241,
           "clicks": 280,
@@ -93,12 +112,15 @@
           "ret50": 11.2,
           "ret95": 3.3,
           "spend": 27.63,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "pause",
           "note": "Retenção 95% de apenas 3,3% — piora ainda mais com 14 dias (2,0%). Custo/visita mais alto (R$0,099). O público não está assistindo."
         },
         {
           "rank": 7,
           "name": "AD05 / AD06 / AD08 — campanha [TRÁFEGO] [SEGUIDORES] 1",
+          "campaign": "",
           "url": null,
           "reach": 57,
           "clicks": 4,
@@ -107,8 +129,114 @@
           "ret50": null,
           "ret95": null,
           "spend": 0.34,
+          "messages": 0,
+          "costPerMessage": null,
           "action": "pause",
           "note": "Alcance somado de apenas 57 pessoas. O Meta escolheu AD11 como vencedor da campanha e parou de distribuir para esses anúncios. Podem ser pausados sem impacto."
+        }
+      ]
+    },
+    {
+      "id": "mensagem",
+      "sectionType": "mensagem",
+      "title": "Campanhas de Mensagem (WhatsApp)",
+      "period": "09/06 a 16/06/2026",
+      "updatedAt": "2026-06-16",
+      "totals": {
+        "spend": 110.67,
+        "clicks": 62,
+        "results": 23,
+        "resultLabel": "mensagens"
+      },
+      "observation": "AMC é 35% mais barata que PA (R$3,81 vs R$5,91 por mensagem). Ambas melhorando — semana anterior custava R$4,33 (AMC) e R$9,25 (PA). Nenhum criativo em vídeo na PA — oportunidade de teste.",
+      "campaigns": [
+        {
+          "name": "AMC — Amancio Construtora",
+          "messages": 12,
+          "spend": 45.68,
+          "costPerMessage": 3.81,
+          "reach": 1279,
+          "action": "keep",
+          "note": "Campanha mais eficiente. R$3,81/msg com tendência de melhora (era R$4,33 na semana anterior). Candidata a receber mais orçamento."
+        },
+        {
+          "name": "PA — Planta Arquitetura",
+          "messages": 11,
+          "spend": 64.99,
+          "costPerMessage": 5.91,
+          "reach": 1414,
+          "action": "test",
+          "note": "Melhorou expressivamente vs semana anterior (era R$9,25/msg). Testar mais 1 semana com orçamento recarregado. Não tem criativo em vídeo — vale testar um."
+        }
+      ],
+      "videos": [
+        {
+          "rank": 1,
+          "name": "AD03 - PRÉDIO EM LSF SERÁ",
+          "campaign": "AMC",
+          "url": "https://www.facebook.com/101549656196804/posts/1766798180970043",
+          "reach": 840,
+          "clicks": 20,
+          "ctr": 2.38,
+          "ret25": null,
+          "ret50": 6.5,
+          "ret95": 1.9,
+          "spend": 21.73,
+          "messages": 7,
+          "costPerMessage": 3.10,
+          "action": "keep",
+          "note": "Melhor criativo do período. R$3,10/msg — carrega sozinho a campanha AMC. Vídeo com boa tração."
+        },
+        {
+          "rank": 2,
+          "name": "AD03 - ABRA SEU NEGÓCIO ATÉ 3X",
+          "campaign": "PA",
+          "url": "https://www.facebook.com/101549656196804/posts/937481459272583",
+          "reach": 754,
+          "clicks": 14,
+          "ctr": 1.86,
+          "ret25": null,
+          "ret50": null,
+          "ret95": null,
+          "spend": 31.25,
+          "messages": 3,
+          "costPerMessage": 10.42,
+          "action": "test",
+          "note": "Criativo dominante da PA (48% do orçamento). Custo/msg de R$10,42 é alto, mas é a imagem que mais converte na campanha. Aguardar mais volume antes de pausar."
+        },
+        {
+          "rank": 3,
+          "name": "AD07 - CTA",
+          "campaign": "PA",
+          "url": "https://www.facebook.com/101549656196804/posts/954896144197781",
+          "reach": 126,
+          "clicks": 3,
+          "ctr": 2.38,
+          "ret25": null,
+          "ret50": null,
+          "ret95": null,
+          "spend": 6.59,
+          "messages": 1,
+          "costPerMessage": 6.59,
+          "action": "test",
+          "note": "Custo/msg de R$6,59 — melhor que AD03 PA. Pouco volume ainda (R$6,59 de gasto). Precisa de mais entrega para avaliar."
+        },
+        {
+          "rank": 4,
+          "name": "AD04 / AD05 / AD01 — PA",
+          "campaign": "PA",
+          "url": null,
+          "reach": 41,
+          "clicks": 0,
+          "ctr": null,
+          "ret25": null,
+          "ret50": null,
+          "ret95": null,
+          "spend": 0.80,
+          "messages": 0,
+          "costPerMessage": null,
+          "action": "pause",
+          "note": "Alcance somado de 41 pessoas, nenhuma mensagem. O algoritmo parou de entregar. Podem ser pausados sem impacto."
         }
       ]
     }
