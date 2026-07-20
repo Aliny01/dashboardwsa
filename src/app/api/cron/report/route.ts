@@ -60,7 +60,6 @@ export async function GET(request: Request) {
         `Cliques: <b>${fmtN(data.overview.clicks)}</b>`,
         `Mensagens WhatsApp: <b>${data.overview.messages}</b>`,
         `Leads formulário: <b>${data.overview.leads}</b>`,
-        `Campanhas ativas: <b>${activeCampaigns.length}</b>`,
       ].join('\n')
 
       await sendTelegram(metaMessage)
@@ -75,14 +74,20 @@ export async function GET(request: Request) {
         )
       }
     } else {
-      await sendTelegram(`⚠️ <b>Meta Ads:</b> erro ao buscar dados — ${meta.reason?.message ?? 'desconhecido'}`)
+      await sendTelegram(`⚠️ <b>Meta Ads:</b> erro ao buscar dados — ${(meta as PromiseRejectedResult).reason?.message ?? 'desconhecido'}`)
     }
 
     // — Google Ads —
     if (google.status === 'fulfilled') {
       const data = google.value
-      const activeCampaigns = data.campaigns.filter(c => c.cost > 0)
       const conv = data.overview.conversionBreakdown
+      const contatos = Math.round(conv.contacts)
+
+      const top3Keywords = [...data.keywords]
+        .sort((a, b) => b.impressions - a.impressions)
+        .slice(0, 3)
+
+      const keywordsComConversao = data.keywords.filter(k => k.conversions > 0)
 
       const googleMessage = [
         `<b>Google Ads — ${dateLabel}</b>`,
@@ -90,15 +95,21 @@ export async function GET(request: Request) {
         `Gasto: <b>${fmt(data.overview.cost)}</b>`,
         `Cliques: <b>${fmtN(data.overview.clicks)}</b>`,
         `Impressões: <b>${fmtN(data.overview.impressions)}</b>`,
-        `Conversões: <b>${Math.round(data.overview.conversions)}</b>`,
+        ...(contatos > 0 ? [`Contatos: <b>${contatos}</b>`] : []),
         ...(conv.calls > 0 ? [`Chamadas: <b>${Math.round(conv.calls)}</b>`] : []),
-        ...(conv.contacts > 0 ? [`Contatos: <b>${Math.round(conv.contacts)}</b>`] : []),
-        `Campanhas ativas: <b>${activeCampaigns.length}</b>`,
+        ``,
+        `<b>Termos mais buscados:</b>`,
+        ...top3Keywords.map((k, i) => `${i + 1}. ${k.keyword} — ${fmtN(k.impressions)} impressões`),
+        ...(keywordsComConversao.length > 0 ? [
+          ``,
+          `<b>Termos com conversão:</b>`,
+          ...keywordsComConversao.map(k => `• ${k.keyword} — ${Math.round(k.conversions)} conversão(ões)`),
+        ] : []),
       ].join('\n')
 
       await sendTelegram(googleMessage)
     } else {
-      await sendTelegram(`⚠️ <b>Google Ads:</b> erro ao buscar dados — ${google.reason?.message ?? 'desconhecido'}`)
+      await sendTelegram(`⚠️ <b>Google Ads:</b> erro ao buscar dados — ${(google as PromiseRejectedResult).reason?.message ?? 'desconhecido'}`)
     }
 
     return NextResponse.json({ ok: true, sent: true, date: dateStr })
