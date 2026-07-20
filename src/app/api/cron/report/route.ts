@@ -54,25 +54,27 @@ export async function GET(request: Request) {
       c => c.spend > 10 && c.leads === 0 && c.messages === 0
     )
 
-    const alertLines = semResultado.length > 0
-      ? `\n⚠️ <b>Sem resultado (gasto &gt; R$10):</b>\n` +
-        semResultado.map(c => `• ${c.name.substring(0, 40)}`).join('\n')
-      : ''
-
     const message = [
-      `📊 <b>WSA Dashboard — Relatório Diário</b>`,
-      `📅 ${dateLabel}`,
+      `<b>WSA Dashboard — Relatório Diário</b>`,
+      `${dateLabel}`,
       ``,
-      `💰 Gasto: <b>${fmt(totalSpend)}</b>`,
-      `👥 Alcance: <b>${fmtN(totalReach)}</b>`,
-      `🖱️ Cliques: <b>${fmtN(totalClicks)}</b>`,
-      `💬 Mensagens WhatsApp: <b>${totalMessages}</b>`,
-      `🎯 Leads formulário: <b>${totalLeads}</b>`,
-      `📣 Campanhas ativas: <b>${activeCampaigns.length}</b>`,
-      alertLines,
+      `Gasto: <b>${fmt(totalSpend)}</b>`,
+      `Alcance: <b>${fmtN(totalReach)}</b>`,
+      `Cliques: <b>${fmtN(totalClicks)}</b>`,
+      `Mensagens WhatsApp: <b>${totalMessages}</b>`,
+      `Leads formulário: <b>${totalLeads}</b>`,
+      `Campanhas ativas: <b>${activeCampaigns.length}</b>`,
     ].join('\n')
 
     await sendTelegram(message)
+
+    if (semResultado.length > 0) {
+      const alertMessage = [
+        `⚠️ <b>Campanhas sem resultado (gasto &gt; R$10):</b>`,
+        ...semResultado.map(c => `• ${c.name.substring(0, 50)}`),
+      ].join('\n')
+      await sendTelegram(alertMessage)
+    }
 
     return NextResponse.json({ ok: true, sent: true, date: dateStr })
   } catch (error) {
