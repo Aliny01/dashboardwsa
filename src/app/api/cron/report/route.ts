@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { fetchMetaDashboard } from '@/lib/meta-api'
+import { fetchGoogleDashboard } from '@/lib/google-api'
 import { format, subDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -41,39 +42,63 @@ export async function GET(request: Request) {
     const dateStr = format(yesterday, 'yyyy-MM-dd')
     const dateLabel = format(yesterday, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
 
-    const data = await fetchMetaDashboard({ since: dateStr, until: dateStr })
+    const [meta, google] = await Promise.allSettled([
+      fetchMetaDashboard({ since: dateStr, until: dateStr }),
+      fetchGoogleDashboard({ since: dateStr, until: dateStr }),
+    ])
 
-    const activeCampaigns = data.campaigns.filter(c => c.spend > 0)
-    const totalSpend = data.overview.spend
-    const totalMessages = data.overview.messages
-    const totalLeads = data.overview.leads
-    const totalClicks = data.overview.clicks
-    const totalReach = data.overview.reach
+    // — Meta Ads —
+    if (meta.status === 'fulfilled') {
+      const data = meta.value
+      const activeCampaigns = data.campaigns.filter(c => c.spend > 0)
 
-    const semResultado = activeCampaigns.filter(
-      c => c.spend > 10 && c.leads === 0 && c.messages === 0
-    )
-
-    const message = [
-      `<b>WSA Dashboard — Relatório Diário</b>`,
-      `${dateLabel}`,
-      ``,
-      `Gasto: <b>${fmt(totalSpend)}</b>`,
-      `Alcance: <b>${fmtN(totalReach)}</b>`,
-      `Cliques: <b>${fmtN(totalClicks)}</b>`,
-      `Mensagens WhatsApp: <b>${totalMessages}</b>`,
-      `Leads formulário: <b>${totalLeads}</b>`,
-      `Campanhas ativas: <b>${activeCampaigns.length}</b>`,
-    ].join('\n')
-
-    await sendTelegram(message)
-
-    if (semResultado.length > 0) {
-      const alertMessage = [
-        `⚠️ <b>Campanhas sem resultado (gasto &gt; R$10):</b>`,
-        ...semResultado.map(c => `• ${c.name.substring(0, 50)}`),
+      const metaMessage = [
+        `<b>Meta Ads — ${dateLabel}</b>`,
+        ``,
+        `Gasto: <b>${fmt(data.overview.spend)}</b>`,
+        `Alcance: <b>${fmtN(data.overview.reach)}</b>`,
+        `Cliques: <b>${fmtN(data.overview.clicks)}</b>`,
+        `Mensagens WhatsApp: <b>${data.overview.messages}</b>`,
+        `Leads formulário: <b>${data.overview.leads}</b>`,
+        `Campanhas ativas: <b>${activeCampaigns.length}</b>`,
       ].join('\n')
-      await sendTelegram(alertMessage)
+
+      await sendTelegram(metaMessage)
+
+      const semResultado = activeCampaigns.filter(
+        c => c.spend > 10 && c.leads === 0 && c.messages === 0
+      )
+      if (semResultado.length > 0) {
+        await sendTelegram(
+          `⚠️ <b>Meta — sem resultado (gasto &gt; R$10):</b>\n` +
+          semResultado.map(c => `• ${c.name.substring(0, 50)}`).join('\n')
+        )
+      }
+    } else {
+      await sendTelegram(`⚠️ <b>Meta Ads:</b> erro ao buscar dados — ${meta.reason?.message ?? 'desconhecido'}`)
+    }
+
+    // — Google Ads —
+    if (google.status === 'fulfilled') {
+      const data = google.value
+      const activeCampaigns = data.campaigns.filter(c => c.cost > 0)
+      const conv = data.overview.conversionBreakdown
+
+      const googleMessage = [
+        `<b>Google Ads — ${dateLabel}</b>`,
+        ``,
+        `Gasto: <b>${fmt(data.overview.cost)}</b>`,
+        `Cliques: <b>${fmtN(data.overview.clicks)}</b>`,
+        `Impressões: <b>${fmtN(data.overview.impressions)}</b>`,
+        `Conversões: <b>${Math.round(data.overview.conversions)}</b>`,
+        ...(conv.calls > 0 ? [`Chamadas: <b>${Math.round(conv.calls)}</b>`] : []),
+        ...(conv.contacts > 0 ? [`Contatos: <b>${Math.round(conv.contacts)}</b>`] : []),
+        `Campanhas ativas: <b>${activeCampaigns.length}</b>`,
+      ].join('\n')
+
+      await sendTelegram(googleMessage)
+    } else {
+      await sendTelegram(`⚠️ <b>Google Ads:</b> erro ao buscar dados — ${google.reason?.message ?? 'desconhecido'}`)
     }
 
     return NextResponse.json({ ok: true, sent: true, date: dateStr })
