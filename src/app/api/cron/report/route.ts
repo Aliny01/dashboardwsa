@@ -50,21 +50,9 @@ export async function GET(request: Request) {
     const totalClicks = data.overview.clicks
     const totalReach = data.overview.reach
 
-    const top3 = [...activeCampaigns]
-      .sort((a, b) => b.spend - a.spend)
-      .slice(0, 3)
-
     const semResultado = activeCampaigns.filter(
       c => c.spend > 10 && c.leads === 0 && c.messages === 0
     )
-
-    const topLines = top3.map((c, i) => {
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'
-      const results = c.messages + c.leads
-      const resultStr = results > 0 ? ` | ${results} result.` : ''
-      const name = c.name.length > 35 ? c.name.substring(0, 35) + '…' : c.name
-      return `${medal} ${name}\n    ${fmt(c.spend)}${resultStr}`
-    }).join('\n')
 
     const alertLines = semResultado.length > 0
       ? `\n⚠️ <b>Sem resultado (gasto &gt; R$10):</b>\n` +
@@ -78,12 +66,9 @@ export async function GET(request: Request) {
       `💰 Gasto: <b>${fmt(totalSpend)}</b>`,
       `👥 Alcance: <b>${fmtN(totalReach)}</b>`,
       `🖱️ Cliques: <b>${fmtN(totalClicks)}</b>`,
-      `💬 Mensagens: <b>${totalMessages}</b>`,
-      `🎯 Leads: <b>${totalLeads}</b>`,
+      `💬 Mensagens WhatsApp: <b>${totalMessages}</b>`,
+      `🎯 Leads formulário: <b>${totalLeads}</b>`,
       `📣 Campanhas ativas: <b>${activeCampaigns.length}</b>`,
-      ``,
-      `🏆 <b>Top campanhas:</b>`,
-      topLines,
       alertLines,
     ].join('\n')
 
