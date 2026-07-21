@@ -28,7 +28,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'google', label: 'Google Ads', icon: <BarChart2 className="w-3.5 h-3.5" /> },
   { id: 'summary', label: 'Resumo', icon: <FileText className="w-3.5 h-3.5" /> },
   { id: 'funil', label: 'Funil (teste)', icon: <Filter className="w-3.5 h-3.5" /> },
-  { id: 'private', label: 'Resumo Privado', icon: <Lock className="w-3.5 h-3.5" /> },
+  // { id: 'private', label: 'Resumo Privado', icon: <Lock className="w-3.5 h-3.5" /> },
 ]
 
 function computeRange(days: number) {
