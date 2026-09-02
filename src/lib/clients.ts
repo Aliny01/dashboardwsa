@@ -15,4 +15,9 @@ export const CLIENTS: Record<string, ClientConfig> = {
     metaAccountId: 'act_815866793070355',
     googleCustomerId: '4096505407',
   },
+  'wsa-sites': {
+    name: 'WSA Sites',
+    metaAccountId: '',
+    googleCustomerId: '5037682976',
+  },
 }

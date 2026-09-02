@@ -27,8 +27,32 @@ async function sendTelegram(text: string) {
   })
 }
 
+function buildDateRange(today: Date): { since: string; until: string; label: string; isWeekend: boolean } {
+  const isMonday = today.getDay() === 1
+
+  if (isMonday) {
+    const friday = subDays(today, 3)
+    const sunday = subDays(today, 1)
+    const friLabel = format(friday, 'dd', { locale: ptBR })
+    const sunLabel = format(sunday, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    return {
+      since: format(friday, 'yyyy-MM-dd'),
+      until: format(sunday, 'yyyy-MM-dd'),
+      label: `Sexta a Domingo — ${friLabel} a ${sunLabel}`,
+      isWeekend: true,
+    }
+  }
+
+  const yesterday = subDays(today, 1)
+  return {
+    since: format(yesterday, 'yyyy-MM-dd'),
+    until: format(yesterday, 'yyyy-MM-dd'),
+    label: format(yesterday, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }),
+    isWeekend: false,
+  }
+}
+
 export async function GET(request: Request) {
-  // Proteção: só roda com o secret correto (Vercel envia automaticamente)
   const auth = request.headers.get('authorization')
   const { searchParams } = new URL(request.url)
   const secret = searchParams.get('secret')
@@ -38,44 +62,46 @@ export async function GET(request: Request) {
   }
 
   try {
-    const yesterday = subDays(new Date(), 1)
-    const dateStr = format(yesterday, 'yyyy-MM-dd')
-    const dateLabel = format(yesterday, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    // Permite override manual: ?since=2026-07-26&until=2026-07-27
+    const forceSince = searchParams.get('since')
+    const forceUntil = searchParams.get('until')
+
+    let since: string, until: string, label: string, isWeekend: boolean
+
+    if (forceSince && forceUntil) {
+      since = forceSince
+      until = forceUntil
+      isWeekend = forceSince !== forceUntil
+      label = isWeekend
+        ? `Fim de semana — ${forceSince} a ${forceUntil}`
+        : forceSince
+    } else {
+      ;({ since, until, label, isWeekend } = buildDateRange(new Date()))
+    }
 
     const [meta, google] = await Promise.allSettled([
-      fetchMetaDashboard({ since: dateStr, until: dateStr }),
-      fetchGoogleDashboard({ since: dateStr, until: dateStr }),
+      fetchMetaDashboard({ since, until }),
+      fetchGoogleDashboard({ since, until }),
     ])
+
+    const lines: string[] = [`<b>Relatório de Mídia — ${label}</b>`, ``]
 
     // — Meta Ads —
     if (meta.status === 'fulfilled') {
       const data = meta.value
-      const activeCampaigns = data.campaigns.filter(c => c.spend > 0)
-
-      const metaMessage = [
-        `<b>Meta Ads — ${dateLabel}</b>`,
-        ``,
+      lines.push(
+        `<b>Meta Ads</b>`,
         `Gasto: <b>${fmt(data.overview.spend)}</b>`,
         `Alcance: <b>${fmtN(data.overview.reach)}</b>`,
         `Cliques: <b>${fmtN(data.overview.clicks)}</b>`,
         `Mensagens WhatsApp: <b>${data.overview.messages}</b>`,
         `Leads formulário: <b>${data.overview.leads}</b>`,
-      ].join('\n')
-
-      await sendTelegram(metaMessage)
-
-      const semResultado = activeCampaigns.filter(
-        c => c.spend > 10 && c.leads === 0 && c.messages === 0
       )
-      if (semResultado.length > 0) {
-        await sendTelegram(
-          `⚠️ <b>Meta — sem resultado (gasto &gt; R$10):</b>\n` +
-          semResultado.map(c => `• ${c.name.substring(0, 50)}`).join('\n')
-        )
-      }
     } else {
-      await sendTelegram(`⚠️ <b>Meta Ads:</b> erro ao buscar dados — ${(meta as PromiseRejectedResult).reason?.message ?? 'desconhecido'}`)
+      lines.push(`<b>Meta Ads</b>`, `⚠️ Erro ao buscar dados`)
     }
+
+    lines.push(``)
 
     // — Google Ads —
     if (google.status === 'fulfilled') {
@@ -89,30 +115,48 @@ export async function GET(request: Request) {
 
       const keywordsComConversao = data.keywords.filter(k => k.conversions > 0)
 
-      const googleMessage = [
-        `<b>Google Ads — ${dateLabel}</b>`,
-        ``,
+      lines.push(
+        `<b>Google Ads</b>`,
         `Gasto: <b>${fmt(data.overview.cost)}</b>`,
         `Cliques: <b>${fmtN(data.overview.clicks)}</b>`,
         `Impressões: <b>${fmtN(data.overview.impressions)}</b>`,
         ...(contatos > 0 ? [`Contatos: <b>${contatos}</b>`] : []),
         ...(conv.calls > 0 ? [`Chamadas: <b>${Math.round(conv.calls)}</b>`] : []),
-        ``,
-        `<b>Termos mais buscados:</b>`,
-        ...top3Keywords.map((k, i) => `${i + 1}. ${k.keyword} — ${fmtN(k.impressions)} impressões`),
-        ...(keywordsComConversao.length > 0 ? [
-          ``,
-          `<b>Termos com conversão:</b>`,
-          ...keywordsComConversao.map(k => `• ${k.keyword} — ${Math.round(k.conversions)} conversão(ões)`),
-        ] : []),
-      ].join('\n')
+      )
 
-      await sendTelegram(googleMessage)
+      if (top3Keywords.length > 0) {
+        lines.push(``, `<b>Termos mais buscados:</b>`)
+        top3Keywords.forEach((k, i) => {
+          lines.push(`${i + 1}. ${k.keyword} — ${fmtN(k.impressions)} impressões`)
+        })
+      }
+
+      if (keywordsComConversao.length > 0) {
+        lines.push(``, `<b>Termos com conversão:</b>`)
+        keywordsComConversao.forEach(k => {
+          lines.push(`• ${k.keyword} — ${Math.round(k.conversions)} conversão(ões)`)
+        })
+      }
     } else {
-      await sendTelegram(`⚠️ <b>Google Ads:</b> erro ao buscar dados — ${(google as PromiseRejectedResult).reason?.message ?? 'desconhecido'}`)
+      lines.push(`<b>Google Ads</b>`, `⚠️ Erro ao buscar dados`)
     }
 
-    return NextResponse.json({ ok: true, sent: true, date: dateStr })
+    await sendTelegram(lines.join('\n'))
+
+    // Alerta de campanhas sem resultado (só no relatório diário)
+    if (!isWeekend && meta.status === 'fulfilled') {
+      const semResultado = meta.value.campaigns.filter(
+        c => c.spend > 10 && c.leads === 0 && c.messages === 0
+      )
+      if (semResultado.length > 0) {
+        await sendTelegram(
+          `⚠️ <b>Meta — sem resultado (gasto &gt; R$10):</b>\n` +
+          semResultado.map(c => `• ${c.name.substring(0, 50)}`).join('\n')
+        )
+      }
+    }
+
+    return NextResponse.json({ ok: true, sent: true, since, until, isWeekend })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro desconhecido'
     await sendTelegram(`❌ Erro no relatório diário: ${message}`)
