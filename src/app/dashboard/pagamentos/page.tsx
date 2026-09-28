@@ -1,11 +1,17 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { RefreshCw, AlertCircle, CircleDot, CreditCard, Wallet, HelpCircle } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { RefreshCw, AlertCircle, CircleDot, HelpCircle } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { ClientPaymentRow } from '@/lib/payments-api'
 
 const AUTO_REFRESH_MS = 5 * 60 * 1000 // 5 minutos
+
+interface ClientGroup {
+  clientKey: string
+  clientName: string
+  platforms: ClientPaymentRow[]
+}
 
 export default function PagamentosPage() {
   const [rows, setRows] = useState<ClientPaymentRow[]>([])
@@ -41,10 +47,21 @@ export default function PagamentosPage() {
   const exhaustedCount = rows.filter((r) => r.exhausted).length
   const inactiveCount = rows.filter((r) => !r.active && !r.error).length
 
+  const groups = useMemo<ClientGroup[]>(() => {
+    const map = new Map<string, ClientGroup>()
+    for (const row of rows) {
+      if (!map.has(row.clientKey)) {
+        map.set(row.clientKey, { clientKey: row.clientKey, clientName: row.clientName, platforms: [] })
+      }
+      map.get(row.clientKey)!.platforms.push(row)
+    }
+    return Array.from(map.values()).sort((a, b) => a.clientName.localeCompare(b.clientName))
+  }, [rows])
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
       <header className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
               <span className="text-white text-xs font-bold">W</span>
@@ -72,7 +89,7 @@ export default function PagamentosPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-4">
+      <main className="max-w-[1800px] mx-auto px-4 sm:px-8 py-6 space-y-4">
         {error && (
           <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl text-sm text-red-700 dark:text-red-400">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
@@ -101,96 +118,99 @@ export default function PagamentosPage() {
         )}
 
         {loading && rows.length === 0 && (
-          <div className="space-y-2 animate-pulse">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="h-14 bg-gray-200 dark:bg-zinc-800 rounded-xl" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-pulse">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 dark:bg-zinc-800 rounded-xl" />
             ))}
           </div>
         )}
 
-        {rows.length > 0 && (
-          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-zinc-800/50 text-left text-xs uppercase tracking-wide text-gray-500 dark:text-zinc-400">
-                  <th className="px-4 py-2.5 font-medium">Cliente</th>
-                  <th className="px-4 py-2.5 font-medium">Plataforma</th>
-                  <th className="px-4 py-2.5 font-medium">Ativo</th>
-                  <th className="px-4 py-2.5 font-medium">Pagamento</th>
-                  <th className="px-4 py-2.5 font-medium">Verba / Saldo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr
-                    key={`${row.clientKey}-${row.platform}`}
-                    className="border-t border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/40"
-                  >
-                    <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-zinc-100">
-                      {row.clientName}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <span
-                        className={clsx(
-                          'text-xs font-medium px-2 py-0.5 rounded-full',
-                          row.platform === 'Meta'
-                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                        )}
-                      >
-                        {row.platform}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      {row.error ? (
-                        <span className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400" title={row.error}>
-                          <HelpCircle className="w-3.5 h-3.5" /> Erro
-                        </span>
-                      ) : (
-                        <span
-                          className={clsx(
-                            'flex items-center gap-1.5 text-xs font-medium',
-                            row.active ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-zinc-500'
-                          )}
-                        >
-                          <CircleDot className="w-3.5 h-3.5" />
-                          {row.active ? 'Ativo' : 'Sem veiculação'}
-                        </span>
+        {groups.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {groups.map((group) => {
+              const anyActive = group.platforms.some((p) => p.active)
+              const anyExhausted = group.platforms.some((p) => p.exhausted)
+
+              return (
+                <div
+                  key={group.clientKey}
+                  className={clsx(
+                    'bg-white dark:bg-zinc-900 border rounded-xl p-4 flex flex-col gap-3',
+                    anyExhausted
+                      ? 'border-red-200 dark:border-red-900'
+                      : 'border-gray-200 dark:border-zinc-800'
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-semibold text-sm text-gray-900 dark:text-zinc-100 truncate">
+                      {group.clientName}
+                    </h3>
+                    <span
+                      className={clsx(
+                        'flex items-center gap-1 text-[11px] font-medium shrink-0',
+                        anyActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-zinc-500'
                       )}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      {row.paymentType === 'Cartão' && (
-                        <span className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-zinc-400">
-                          <CreditCard className="w-3.5 h-3.5" /> {row.cardLabel ?? 'Cartão'}
-                        </span>
-                      )}
-                      {row.paymentType === 'Verba' && (
-                        <span className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-zinc-400">
-                          <Wallet className="w-3.5 h-3.5" /> Verba
-                        </span>
-                      )}
-                      {row.paymentType === 'Sem dados' && (
-                        <span className="text-xs text-gray-400 dark:text-zinc-500">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      {row.paymentType === 'Verba' ? (
-                        <span
-                          className={clsx(
-                            'text-xs font-semibold',
-                            row.exhausted ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-zinc-300'
-                          )}
-                        >
-                          {row.exhausted ? 'Esgotado' : row.balanceLabel}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400 dark:text-zinc-500">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    >
+                      <CircleDot className="w-3 h-3" />
+                      {anyActive ? 'Ativo' : 'Parado'}
+                    </span>
+                  </div>
+
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-[10px] uppercase tracking-wide text-gray-400 dark:text-zinc-500">
+                        <th className="font-medium pb-1.5">Plataforma</th>
+                        <th className="font-medium pb-1.5">Pagamento</th>
+                        <th className="font-medium pb-1.5 text-right">Saldo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.platforms.map((p) => (
+                        <tr key={p.platform} className="border-t border-gray-100 dark:border-zinc-800">
+                          <td className="py-1.5">
+                            <span
+                              className={clsx(
+                                'text-[10px] font-medium px-1.5 py-0.5 rounded',
+                                p.platform === 'Meta'
+                                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
+                                  : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                              )}
+                            >
+                              {p.platform}
+                            </span>
+                          </td>
+                          <td className="py-1.5 text-gray-600 dark:text-zinc-400">
+                            {p.error ? (
+                              <span className="flex items-center gap-1 text-red-600 dark:text-red-400" title={p.error}>
+                                <HelpCircle className="w-3 h-3" /> Erro
+                              </span>
+                            ) : p.paymentType === 'Cartão' ? (
+                              p.cardLabel ?? 'Cartão'
+                            ) : p.paymentType === 'Verba' ? (
+                              'Verba'
+                            ) : (
+                              <span className="text-gray-400 dark:text-zinc-500">—</span>
+                            )}
+                          </td>
+                          <td
+                            className={clsx(
+                              'py-1.5 text-right font-semibold',
+                              p.exhausted
+                                ? 'text-red-600 dark:text-red-400'
+                                : p.paymentType === 'Verba'
+                                  ? 'text-gray-700 dark:text-zinc-300'
+                                  : 'text-gray-400 dark:text-zinc-500'
+                            )}
+                          >
+                            {p.paymentType === 'Verba' ? (p.exhausted ? 'Esgotado' : p.balanceLabel) : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            })}
           </div>
         )}
 
