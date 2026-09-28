@@ -1,5 +1,6 @@
 import { GoogleAdsApi } from 'google-ads-api'
 import { AGENCY_CLIENTS, GOOGLE_MCC_LOGIN_CUSTOMER_ID, type AgencyClient } from '@/lib/agency-clients'
+import { findBoletoSchedule, nextExpectedDate, type BoletoFrequency } from '@/lib/boleto-schedule'
 
 const META_BASE = 'https://graph.facebook.com/v21.0'
 const META_TOKEN = process.env.META_ACCESS_TOKEN!
@@ -17,6 +18,10 @@ export interface ClientPaymentRow {
   exhausted?: boolean
   spend7d: number
   error?: string
+  boletoAmount?: number
+  boletoFrequency?: BoletoFrequency
+  lastPaymentDate?: string
+  nextExpectedDate?: string
 }
 
 interface GoogleAccountBudgetRow {
@@ -194,5 +199,18 @@ export async function fetchAllPayments(): Promise<ClientPaymentRow[]> {
     if (client.googleCustomerId) tasks.push(fetchGoogleRow(client))
   }
   const results = await Promise.all(tasks)
-  return results.sort((a, b) => a.clientName.localeCompare(b.clientName) || a.platform.localeCompare(b.platform))
+
+  const withBoleto = results.map((row) => {
+    const schedule = findBoletoSchedule(row.clientKey, row.platform)
+    if (!schedule) return row
+    return {
+      ...row,
+      boletoAmount: schedule.amount,
+      boletoFrequency: schedule.frequency,
+      lastPaymentDate: schedule.lastPaymentDate,
+      nextExpectedDate: nextExpectedDate(schedule),
+    }
+  })
+
+  return withBoleto.sort((a, b) => a.clientName.localeCompare(b.clientName) || a.platform.localeCompare(b.platform))
 }

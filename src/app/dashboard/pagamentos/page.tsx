@@ -13,6 +13,11 @@ interface ClientGroup {
   platforms: ClientPaymentRow[]
 }
 
+function formatDDMM(isoDate: string): string {
+  const [, month, day] = isoDate.split('-')
+  return `${day}/${month}`
+}
+
 export default function PagamentosPage() {
   const [rows, setRows] = useState<ClientPaymentRow[]>([])
   const [loading, setLoading] = useState(false)
@@ -208,6 +213,19 @@ export default function PagamentosPage() {
                       ))}
                     </tbody>
                   </table>
+
+                  {group.platforms.some((p) => p.nextExpectedDate) && (
+                    <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-0.5">
+                      {group.platforms
+                        .filter((p) => p.nextExpectedDate)
+                        .map((p) => (
+                          <p key={p.platform} className="text-[10px] text-gray-400 dark:text-zinc-500">
+                            Próx. boleto {p.platform}: {formatDDMM(p.nextExpectedDate!)} (R$ {p.boletoAmount},00
+                            {p.boletoFrequency ? ` ${p.boletoFrequency}` : ''})
+                          </p>
+                        ))}
+                    </div>
+                  )}
                 </div>
               )
             })}
