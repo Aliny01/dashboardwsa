@@ -31,6 +31,17 @@ const CLIENTS = [
     bgColor: 'bg-emerald-50 dark:bg-emerald-950/20',
     initial: 'E',
   },
+  {
+    key: 'pagamentos',
+    name: 'Pagamentos · Agência Win',
+    description: 'Cartão, verba e status de todas as contas',
+    href: '/dashboard/pagamentos',
+    color: 'bg-amber-600',
+    textColor: 'text-amber-600 dark:text-amber-400',
+    borderColor: 'border-amber-200 dark:border-amber-900',
+    bgColor: 'bg-amber-50 dark:bg-amber-950/20',
+    initial: 'P',
+  },
 ]
 
 function PasswordScreen({ onAuth }: { onAuth: () => void }) {
