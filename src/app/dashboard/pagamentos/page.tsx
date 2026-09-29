@@ -51,6 +51,7 @@ export default function PagamentosPage() {
 
   const exhaustedCount = rows.filter((r) => r.exhausted).length
   const inactiveCount = rows.filter((r) => !r.active && !r.error).length
+  const errorCount = rows.filter((r) => r.error).length
 
   const groups = useMemo<ClientGroup[]>(() => {
     const map = new Map<string, ClientGroup>()
@@ -105,7 +106,7 @@ export default function PagamentosPage() {
           </div>
         )}
 
-        {(exhaustedCount > 0 || inactiveCount > 0) && !loading && (
+        {(exhaustedCount > 0 || inactiveCount > 0 || errorCount > 0) && !loading && (
           <div className="flex flex-wrap gap-3">
             {exhaustedCount > 0 && (
               <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900">
@@ -117,6 +118,12 @@ export default function PagamentosPage() {
               <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400">
                 <CircleDot className="w-3.5 h-3.5" />
                 {inactiveCount} conta{inactiveCount > 1 ? 's' : ''} sem veiculação nos últimos 7 dias
+              </div>
+            )}
+            {errorCount > 0 && (
+              <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
+                <HelpCircle className="w-3.5 h-3.5" />
+                {errorCount} conta{errorCount > 1 ? 's' : ''} com erro ao buscar dados (não é o mesmo que parado)
               </div>
             )}
           </div>
@@ -135,29 +142,35 @@ export default function PagamentosPage() {
             {groups.map((group) => {
               const anyActive = group.platforms.some((p) => p.active)
               const anyExhausted = group.platforms.some((p) => p.exhausted)
+              // erro de busca (token/API) é diferente de conta parada de verdade — nunca misturar os dois.
+              const allErrored = group.platforms.length > 0 && group.platforms.every((p) => p.error)
+
+              const statusLabel = allErrored ? 'Erro ao buscar' : anyActive ? 'Ativo' : 'Parado'
+              const statusColor = allErrored
+                ? 'text-amber-600 dark:text-amber-400'
+                : anyActive
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-gray-400 dark:text-zinc-500'
 
               return (
                 <div
                   key={group.clientKey}
                   className={clsx(
                     'bg-white dark:bg-zinc-900 border rounded-xl p-4 flex flex-col gap-3',
-                    anyExhausted
-                      ? 'border-red-200 dark:border-red-900'
-                      : 'border-gray-200 dark:border-zinc-800'
+                    allErrored
+                      ? 'border-amber-200 dark:border-amber-900'
+                      : anyExhausted
+                        ? 'border-red-200 dark:border-red-900'
+                        : 'border-gray-200 dark:border-zinc-800'
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-semibold text-sm text-gray-900 dark:text-zinc-100 truncate">
                       {group.clientName}
                     </h3>
-                    <span
-                      className={clsx(
-                        'flex items-center gap-1 text-[11px] font-medium shrink-0',
-                        anyActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-zinc-500'
-                      )}
-                    >
-                      <CircleDot className="w-3 h-3" />
-                      {anyActive ? 'Ativo' : 'Parado'}
+                    <span className={clsx('flex items-center gap-1 text-[11px] font-medium shrink-0', statusColor)}>
+                      {allErrored ? <HelpCircle className="w-3 h-3" /> : <CircleDot className="w-3 h-3" />}
+                      {statusLabel}
                     </span>
                   </div>
 

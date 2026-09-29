@@ -70,8 +70,9 @@ function parseMetaFunding(fundingSourceDetails: { type?: number; display_string?
 
   // type 1 = cartão de crédito. Qualquer outro tipo (boleto/pix/saldo) tratamos como "Verba".
   // Algumas contas de cartão não trazem display_string (só cupons expirados) — ainda assim é cartão.
+  // Não expor qual cartão é (bandeira/final) — só precisa saber que é faturamento por cartão.
   if (type === 1) {
-    return { paymentType: 'Cartão' as PaymentType, cardLabel: display_string ?? 'Cartão' }
+    return { paymentType: 'Cartão' as PaymentType, cardLabel: 'Cartão de crédito' }
   }
 
   if (!display_string) {
