@@ -22,6 +22,7 @@ export const AGENCY_CLIENTS: AgencyClient[] = [
   { key: 'esquina-espetinho', name: 'Esquina do Espetinho', metaAccountId: 'act_427551698538886' },
   { key: 'freeway', name: 'Freeway', metaAccountId: 'act_899075609601073', googleCustomerId: '7173142409' },
   { key: 'la-biblioteca', name: 'La Biblioteca', metaAccountId: 'act_858666333498261', googleCustomerId: '5433413925' },
+  { key: 'move-tour-360', name: 'Move Tour 360', metaAccountId: 'act_1512926066495482', googleCustomerId: '8229375574' },
   { key: 'mova-parts', name: 'Mova Parts', metaAccountId: 'act_954295689040652', googleCustomerId: '2027952298' },
   { key: 'santa-cana', name: 'Santa Cana', metaAccountId: 'act_927857472509595', googleCustomerId: '8960847497' },
   { key: 'madeireira-peroba', name: 'Madeireira Peroba', googleCustomerId: '3017184711' },
